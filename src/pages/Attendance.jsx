@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AlertTriangle, CheckCircle, Info, TrendingUp, BookOpen, Calculator } from 'lucide-react';
 import SemesterFilter from '../components/SemesterFilter';
 import { useMode } from '../context/ModeContext';
 import { subjects as schoolSubjects } from '../data/schoolData';
@@ -191,6 +192,130 @@ const Attendance = () => {
            </div>
         </div>
       </div>
+
+      {/* Attendance Advisory Section - College Only */}
+      {mode === 'college' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-50 bg-indigo-50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                <Calculator className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">Attendance Advisory</h2>
+                <p className="text-sm text-gray-600">Smart analysis to help you maintain 75% eligibility</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Subject-wise Analysis */}
+            <div className="space-y-6">
+              <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-gray-500" />
+                Subject-wise Recovery Plan
+              </h3>
+              
+              <div className="space-y-4">
+                {currentData.subjects.map((subject, idx) => {
+                  // Calculate classes needed to reach 75%
+                  // Formula: (CurrentAttended + x) / (CurrentTotal + x) >= 0.75
+                  // x >= 3 * Total - 4 * Attended
+                  const classesNeeded = Math.ceil(3 * subject.total - 4 * subject.attended);
+                  const isSafe = subject.pct >= 75;
+                  
+                  return (
+                    <div key={idx} className={`p-4 rounded-lg border ${isSafe ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-bold text-gray-800">{subject.name}</h4>
+                          <p className="text-xs text-gray-500">Current: {subject.attended}/{subject.total} ({subject.pct}%)</p>
+                        </div>
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${isSafe ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {isSafe ? 'Safe' : 'Critical'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 text-sm">
+                        {isSafe ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                            <p className="text-green-700">
+                              You are in the safe zone. You can afford to miss <strong>{Math.floor((subject.attended - 0.75 * subject.total) / 0.75)}</strong> classes while staying above 75%.
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                            <p className="text-red-700">
+                              You need to attend the next <strong>{classesNeeded > 0 ? classesNeeded : 1}</strong> consecutive classes to reach 75%.
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* General Strategy */}
+            <div className="space-y-6">
+              <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-gray-500" />
+                Overall Strategy & Tips
+              </h3>
+
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
+                <div className="flex gap-4">
+                  <div className="p-2 bg-blue-100 text-blue-600 rounded-lg h-fit">
+                    <Info className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-blue-800 mb-2">The 75% Rule Explained</h4>
+                    <p className="text-sm text-blue-700 mb-4">
+                      According to university regulations, a minimum of 75% attendance is mandatory to be eligible for end-semester examinations. Falling below this may result in debarment.
+                    </p>
+                    
+                    <ul className="space-y-3">
+                      <li className="flex gap-2 text-sm text-blue-800">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                        <span><strong>Medical Leave:</strong> Submit valid medical certificates within 3 days of rejoining.</span>
+                      </li>
+                      <li className="flex gap-2 text-sm text-blue-800">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                        <span><strong>Duty Leave:</strong> Apply for OD if representing college in events/sports.</span>
+                      </li>
+                      <li className="flex gap-2 text-sm text-blue-800">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                        <span><strong>Condonation:</strong> 65-75% may be condoned with a penalty fee if valid reasons exist.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-orange-50 border border-orange-100 rounded-xl p-5">
+                <h4 className="font-bold text-orange-800 mb-3">Action Plan for This Week</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-100 shadow-sm">
+                    <input type="checkbox" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500" />
+                    <span className="text-sm text-gray-700">Attend all lab sessions (high weightage)</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-100 shadow-sm">
+                    <input type="checkbox" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500" />
+                    <span className="text-sm text-gray-700">Meet HOD regarding medical certificate status</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-100 shadow-sm">
+                    <input type="checkbox" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500" />
+                    <span className="text-sm text-gray-700">Check updated attendance on Friday evening</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

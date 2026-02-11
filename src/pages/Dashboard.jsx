@@ -1,6 +1,6 @@
 import React from 'react';
-import NoticeFeed from '../components/dashboard/NoticeFeed';
 import SchoolDashboard from '../components/dashboard/SchoolDashboard';
+import CollegeDashboard from '../components/dashboard/CollegeDashboard';
 import { useMode } from '../context/ModeContext';
 
 const Dashboard = () => {
@@ -10,14 +10,7 @@ const Dashboard = () => {
     return <SchoolDashboard />;
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Only Feed/Notice Section as per new requirements */}
-      <div className="grid grid-cols-1">
-        <NoticeFeed />
-      </div>
-    </div>
-  );
+  return <CollegeDashboard />;
 };
 
 export default Dashboard;
